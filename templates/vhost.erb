@@ -1,0 +1,10 @@
+server {
+    root <%= scope.lookupvar('::satis::params::repositories_path') %>;
+    index index.html index.htm;
+ 
+    server_name <%= @server_name %>;
+ 
+    location / {
+        autoindex on;
+    }
+}

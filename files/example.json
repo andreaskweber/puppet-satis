@@ -1,0 +1,11 @@
+{
+    "name": "Example",
+    "homepage": "http://satis.example.com",
+    "repositories": [
+        { "type": "composer", "url": "https://packagist.org" }
+    ],
+    "require": {
+        "monolog/monolog": "*"
+    },
+    "require-dependencies": true
+}

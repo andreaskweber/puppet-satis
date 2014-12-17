@@ -1,0 +1,13 @@
+# IDEs
+.buildpath
+.project
+.settings
+.build
+.idea
+
+# OS generated files
+desktop.ini
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
