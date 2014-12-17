@@ -41,9 +41,7 @@ class satis ($server_name)
   }
 
   class { 'composer':
-    command_name => 'composer',
-    target_dir   => '/usr/local/bin',
-    require      => Package['php5-cli']
+    require => Package['php5-cli']
   }
 
   file { $::satis::params::configuration_path:
@@ -86,7 +84,10 @@ class satis ($server_name)
     environment => [
       "COMPOSER_HOME=${satis::params::home_path}"
     ],
-    require     => User['satis']
+    require     => [
+      Class['composer'],
+      User['satis']
+    ]
   }
 
   exec { 'upgrade satis':
@@ -98,9 +99,6 @@ class satis ($server_name)
     environment => [
       "COMPOSER_HOME=${satis::params::home_path}"
     ],
-    require     => [
-      User['satis'],
-      Exec['install satis']
-    ]
+    require     => Exec['install satis']
   }
 }
