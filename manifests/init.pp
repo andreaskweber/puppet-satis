@@ -1,6 +1,7 @@
 # == Class: satis
 #
 # The satis class manages the installation and configuration of satis.
+# An oauth token for github has to be passend. An auth.json will be created.
 #
 # === Parameters
 #
@@ -22,7 +23,10 @@
 #
 # Copyright 2014 Andreas Weber
 #
-class satis ($server_name)
+class satis (
+  $server_name,
+  $token
+)
 {
   include satis::params
 
@@ -56,6 +60,12 @@ class satis ($server_name)
     system     => true,
     managehome => true,
     home       => $::satis::params::home_path,
+  }
+
+  class { 'composer::token':
+    home_dir => $::satis::params::home_path,
+    token    => $token,
+    require  => User['satis']
   }
 
   file { $::satis::params::repositories_path:
