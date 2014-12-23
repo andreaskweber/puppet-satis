@@ -7,5 +7,10 @@
     "require": {
         "monolog/monolog": "*"
     },
-    "require-dependencies": true
+    "require-dependencies": true,
+    "require-dev-dependencies": true,
+    "archive": {
+        "directory": "dist",
+        "format": "tar"
+    }
 }
