@@ -46,13 +46,6 @@ class aw_satis (
     require => Package['nginx'],
   }
 
-  class { 'aw_composer':
-    require => [
-      Class['aw_php'],
-      Class['aw_packages'],
-    ]
-  }
-
   file { $::aw_satis::params::configuration_path:
     ensure => 'directory',
     owner  => '0',
@@ -101,6 +94,8 @@ class aw_satis (
       "COMPOSER_HOME=${aw_satis::params::home_path}"
     ],
     require     => [
+      Class['aw_packages'],
+      Class['aw_php'],
       Class['aw_composer'],
       User[$::aw_satis::params::user]
     ]
