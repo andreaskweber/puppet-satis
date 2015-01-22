@@ -1,4 +1,4 @@
-# == Define: satis::repository
+# == Define: aw_satis::repository
 #
 # This resource manages the creation and updating from different satis repositories.
 #
@@ -9,8 +9,8 @@
 #
 # === Examples
 #
-#  satis::repository{ 'example':
-#    config => 'puppet:///modules/satis/example.json'
+#  aw_satis::repository{ 'example':
+#    config => 'puppet:///modules/aw_satis/example.json'
 #  }
 #
 # === Authors
@@ -19,14 +19,15 @@
 #
 # === Copyright
 #
-# Copyright 2014 Andreas Weber
+# Copyright 2015 Andreas Weber
 #
-define satis::repository ($config)
+define aw_satis::repository ($config)
 {
-  require 'satis'
+  include aw_satis
+  include aw_satis::params
 
-  $config_path = "${satis::params::configuration_path}/${name}.json"
-  $repository_path = "${satis::params::repositories_path}/${name}"
+  $config_path = "${aw_satis::params::configuration_path}/${name}.json"
+  $repository_path = "${aw_satis::params::repositories_path}/${name}"
 
   file { $config_path:
     owner   => '0',
@@ -36,18 +37,18 @@ define satis::repository ($config)
   }
 
   exec { "create satis repo ${name}":
-    command     => "${satis::params::bin_path} --no-interaction build ${config_path} ${repository_path}",
+    command     => "${aw_satis::params::bin_path} --no-interaction build ${config_path} ${repository_path}",
     refreshonly => true,
-    cwd         => $::satis::params::home_path,
-    user        => 'satis',
+    cwd         => $::aw_satis::params::home_path,
+    user        => $::aw_satis::params::user,
     environment => [
-      "COMPOSER_HOME=${satis::params::home_path}"
+      "COMPOSER_HOME=${aw_satis::params::home_path}"
     ]
   }
 
   cron { "cron satis repo ${name}":
-    command => "${satis::params::bin_path} --no-interaction --quiet build ${config_path} ${repository_path}",
+    command => "${aw_satis::params::bin_path} --no-interaction --quiet build ${config_path} ${repository_path}",
     minute  => '*/5',
-    user    => 'satis' # autorequired
+    user    => $::aw_satis::params::user
   }
 }

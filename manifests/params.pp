@@ -1,10 +1,10 @@
-# = Class: satis::params
+# = Class: aw_satis::params
 #
 # This class defines default parameters used by the main module class satis.
 #
 # == Variables:
 #
-# Refer to satis class for the variables defined here.
+# Refer to aw_satis class for the variables defined here.
 #
 # == Examples:
 #
@@ -17,15 +17,15 @@
 #
 # === Copyright
 #
-# Copyright 2014 Andreas Weber
+# Copyright 2015 Andreas Weber
 #
-class satis::params
+class aw_satis::params
 {
   $user = 'satis'
   $home_path = '/var/lib/satis'
   $bin_path = '/var/lib/satis/satis/bin/satis'
   $configuration_path = '/etc/satis'
   $repositories_path = '/var/lib/satis/repositories'
-  $satis_version = 'b20fd944ec40ad65c1e54bb0860fe844f4efd56e'
-  $vhost_template = 'satis/vhost.erb'
+  $satis_version = '3dc787c16f1082784808e4a09d0e9e2fb2661afc'
+  $vhost_template = 'aw_satis/vhost.erb'
 }

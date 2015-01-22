@@ -1,7 +1,7 @@
-# == Class: satis
+# == Class: aw_satis
 #
-# The satis class manages the installation and configuration of satis.
-# An oauth token for github has to be passend. An auth.json will be created.
+# The aw_satis class manages the installation and configuration of satis.
+# When an oauth token for github is passend, an auth.json file will be created.
 #
 # === Parameters
 #
@@ -9,10 +9,14 @@
 #   The server name should be the fqdn under which the satis installation is
 #   accessible by http.
 #
+# [*token*]
+#   The oauth token to access github api.
+#
 # === Examples
 #
-#  class { 'satis':
-#    server_name => 'satis.example.com
+#  class { 'aw_satis':
+#    server_name => 'satis.example.com,
+#    token       => 'my_github_oauth_token'
 #  }
 #
 # === Authors
@@ -21,14 +25,14 @@
 #
 # === Copyright
 #
-# Copyright 2014 Andreas Weber
+# Copyright 2015 Andreas Weber
 #
-class satis (
+class aw_satis (
   $server_name,
-  $token
+  $token = undef
 )
 {
-  include satis::params
+  include aw_satis::params
 
   package { [
     'git',
@@ -44,36 +48,37 @@ class satis (
     require => Package['nginx'],
   }
 
-  class { 'composer':
+  class { 'aw_composer':
     require => Package['php5-cli']
   }
 
-  file { $::satis::params::configuration_path:
+  file { $::aw_satis::params::configuration_path:
     ensure => 'directory',
     owner  => '0',
     group  => '0',
     mode   => '0755',
   }
 
-  user { 'satis':
+  user { $::aw_satis::params::user:
     ensure     => present,
     system     => true,
     managehome => true,
-    home       => $::satis::params::home_path,
+    home       => $::aw_satis::params::home_path,
   }
 
-  class { 'composer::token':
-    home_dir => $::satis::params::home_path,
-    token    => $token,
-    require  => User['satis']
+  if ! $token == undef {
+    aw_composer::token { $::aw_satis::params::user:
+      home_dir => $::aw_satis::params::home_path,
+      token    => $token
+    }
   }
 
-  file { $::satis::params::repositories_path:
+  file { $::aw_satis::params::repositories_path:
     ensure  => 'directory',
-    owner   => 'satis',
-    group   => 'satis',
+    owner   => $::aw_satis::params::user,
+    group   => $::aw_satis::params::user,
     mode    => '0755',
-    require => User['satis']
+    require => User[$::aw_satis::params::user]
   }
 
   file { "/etc/nginx/sites-enabled/${server_name}":
@@ -81,33 +86,33 @@ class satis (
     owner   => '0',
     group   => '0',
     mode    => '0644',
-    content => template($::satis::params::vhost_template),
-    require => File[$::satis::params::repositories_path],
+    content => template($::aw_satis::params::vhost_template),
+    require => File[$::aw_satis::params::repositories_path],
     notify  => Service['nginx']
   }
 
   exec { 'install satis':
-    command     => "composer --no-interaction create-project composer/satis --stability=dev --keep-vcs ${satis::params::home_path}/satis",
-    creates     => "${satis::params::home_path}/satis",
+    command     => "composer --no-interaction create-project composer/satis --stability=dev --keep-vcs ${aw_satis::params::home_path}/satis",
+    creates     => "${aw_satis::params::home_path}/satis",
     path        => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-    user        => 'satis',
+    user        => $::aw_satis::params::user,
     environment => [
-      "COMPOSER_HOME=${satis::params::home_path}"
+      "COMPOSER_HOME=${aw_satis::params::home_path}"
     ],
     require     => [
-      Class['composer'],
-      User['satis']
+      Class['aw_composer'],
+      User[$::aw_satis::params::user]
     ]
   }
 
   exec { 'upgrade satis':
-    command     => "git fetch && git checkout ${::satis::params::satis_version} && composer --no-interaction install",
-    creates     => "${satis::params::home_path}/satis",
-    unless      => "test $(git rev-parse HEAD) = ${::satis::params::satis_version}",
+    command     => "git fetch && git checkout ${::aw_satis::params::satis_version} && composer --no-interaction install",
+    creates     => "${aw_satis::params::home_path}/satis",
+    unless      => "test $(git rev-parse HEAD) = ${::aw_satis::params::satis_version}",
     path        => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-    user        => 'satis',
+    user        => $::aw_satis::params::user,
     environment => [
-      "COMPOSER_HOME=${satis::params::home_path}"
+      "COMPOSER_HOME=${aw_satis::params::home_path}"
     ],
     require     => Exec['install satis']
   }
