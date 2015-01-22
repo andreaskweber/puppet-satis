@@ -15,7 +15,7 @@
 # === Examples
 #
 #  class { 'aw_satis':
-#    server_name => 'satis.example.com,
+#    server_name => 'satis.example.com',
 #    token       => 'my_github_oauth_token'
 #  }
 #
@@ -60,7 +60,7 @@ class aw_satis (
     home       => $::aw_satis::params::home_path,
   }
 
-  if ! $token == undef {
+  if $token != undef {
     aw_composer::token { $::aw_satis::params::user:
       home_dir => $::aw_satis::params::home_path,
       token    => $token
