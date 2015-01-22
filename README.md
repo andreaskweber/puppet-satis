@@ -5,6 +5,8 @@ If you already have a webserver installed, don't use this class because nginx wi
 
 ##Dependencies
 
+- https://github.com/andreas-weber/puppet-packages
+- https://github.com/andreas-weber/puppet-php
 - https://github.com/andreas-weber/puppet-composer
 
 ## Puppetfile

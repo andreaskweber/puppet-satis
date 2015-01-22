@@ -35,8 +35,6 @@ class aw_satis (
   include aw_satis::params
 
   package { [
-    'git',
-    'php5-cli',
     'nginx'
   ]:
     ensure  => 'installed'
@@ -49,7 +47,10 @@ class aw_satis (
   }
 
   class { 'aw_composer':
-    require => Package['php5-cli']
+    require => [
+      Class['aw_php'],
+      Class['aw_packages'],
+    ]
   }
 
   file { $::aw_satis::params::configuration_path:
